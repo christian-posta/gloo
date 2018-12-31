@@ -107,6 +107,26 @@ gateway-docker: $(OUTPUT_DIR)/gateway-linux-amd64 $(OUTPUT_DIR)/Dockerfile.gatew
 	docker build -t soloio/gateway:$(VERSION)  $(OUTPUT_DIR) -f $(OUTPUT_DIR)/Dockerfile.gateway
 
 #----------------------------------------------------------------------------------
+# Ingress
+#----------------------------------------------------------------------------------
+
+INGRESS_DIR=projects/ingress
+INGRESS_SOURCES=$(shell find $(INGRESS_DIR) -name "*.go" | grep -v test | grep -v generated.go)
+
+$(OUTPUT_DIR)/ingress-linux-amd64: $(INGRESS_SOURCES)
+	CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -ldflags=$(LDFLAGS) -o $@ $(INGRESS_DIR)/cmd/main.go
+
+
+.PHONY: ingress
+ingress: $(OUTPUT_DIR)/ingress-linux-amd64
+
+$(OUTPUT_DIR)/Dockerfile.ingress: $(INGRESS_DIR)/cmd/Dockerfile
+	cp $< $@
+
+ingress-docker: $(OUTPUT_DIR)/ingress-linux-amd64 $(OUTPUT_DIR)/Dockerfile.ingress
+	docker build -t soloio/ingress:$(VERSION)  $(OUTPUT_DIR) -f $(OUTPUT_DIR)/Dockerfile.ingress
+
+#----------------------------------------------------------------------------------
 # Discovery
 #----------------------------------------------------------------------------------
 
@@ -190,6 +210,7 @@ GH_REPO:=gloo
 
 RELEASE_BINARIES := \
 	$(OUTPUT_DIR)/gateway-linux-amd64 \
+	$(OUTPUT_DIR)/ingress-linux-amd64 \
 	$(OUTPUT_DIR)/gloo-linux-amd64 \
 	$(OUTPUT_DIR)/discovery-linux-amd64 \
 	$(OUTPUT_DIR)/envoyinit-linux-amd64 \
@@ -213,9 +234,10 @@ release: release-binaries
 #---------
 
 .PHONY: docker docker-push
-docker: discovery-docker gateway-docker gloo-docker
+docker: discovery-docker gateway-docker ingress-docker gloo-docker gloo-envoy-wrapper
 docker-push:
 	docker push soloio/gateway:$(VERSION) && \
+	docker push soloio/ingress:$(VERSION) && \
 	docker push soloio/discovery:$(VERSION) && \
 	docker push soloio/gloo:$(VERSION) && \
 	docker push soloio/gloo-envoy-wrapper:$(VERSION)
