@@ -36,23 +36,23 @@ func (s ApiSnapshot) Hash() uint64 {
 }
 
 func (s ApiSnapshot) hashProxies() uint64 {
-	return hashutils.HashAll(s.Proxies.List().AsInterfaces()...)
+	return hashutils.HashAll(s.Proxies.List()...)
 }
 
 func (s ApiSnapshot) hashArtifacts() uint64 {
-	return hashutils.HashAll(s.Artifacts.List().AsInterfaces()...)
+	return hashutils.HashAll(s.Artifacts.List()...)
 }
 
 func (s ApiSnapshot) hashEndpoints() uint64 {
-	return hashutils.HashAll(s.Endpoints.List().AsInterfaces()...)
+	return hashutils.HashAll(s.Endpoints.List()...)
 }
 
 func (s ApiSnapshot) hashSecrets() uint64 {
-	return hashutils.HashAll(s.Secrets.List().AsInterfaces()...)
+	return hashutils.HashAll(s.Secrets.List()...)
 }
 
 func (s ApiSnapshot) hashUpstreams() uint64 {
-	return hashutils.HashAll(s.Upstreams.List().AsInterfaces()...)
+	return hashutils.HashAll(s.Upstreams.List()...)
 }
 
 func (s ApiSnapshot) HashFields() []zap.Field {
