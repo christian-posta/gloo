@@ -234,7 +234,7 @@ release: release-binaries
 #---------
 
 .PHONY: docker docker-push
-docker: discovery-docker gateway-docker ingress-docker gloo-docker gloo-envoy-wrapper
+docker: discovery-docker gateway-docker ingress-docker gloo-docker gloo-envoy-wrapper-docker
 docker-push:
 	docker push soloio/gateway:$(VERSION) && \
 	docker push soloio/ingress:$(VERSION) && \
